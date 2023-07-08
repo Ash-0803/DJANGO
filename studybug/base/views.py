@@ -1,23 +1,24 @@
+from django.db.models import Q
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 
 from .forms import RoomForm
 from .models import Room, Topic
 
 # Create your views here.
 
-rooms = [
-    {"id": 1, "name": "Let's Learn Python"},
-    {"id": 2, "name": "Design with me"},
-    {"id": 3, "name": "FrontEnd Development"},
-]
-
 
 def home(request):
-    rooms = Room.objects.all()
+    q = request.GET.get("q") if request.GET.get("q") != None else ""
+    rooms = Room.objects.filter(
+        Q(topic__name__icontains=q) | 
+        Q(name__icontains=q) | 
+        Q(description__icontains=q)
+    )
+    rooms_count = rooms.count()
     topics = Topic.objects.all()
 
-    context = {"rooms": rooms}
+    context = {"rooms": rooms, "topics": topics, "count":rooms_count}
     return render(request, "base/home.html", context)
 
 
@@ -35,6 +36,7 @@ def createRoom(request):
         form = RoomForm(request.POST)
         if form.is_valid():
             form.save()
+            return redirect("home")
 
     context = {"form": form}
     return render(request, "base/room_form.html", context)

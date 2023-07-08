@@ -9,11 +9,22 @@
   <div>
     <h3>Browse Topics</h3>
     <hr />
+
+    <div>
+      <a href="{% url 'home' %}">All</a>
+    </div>
+    {% for topic in topics %}
+    <div>
+      <a href="{% url 'home' %}?q={{topic.name}}">{{topic.name}}</a>
+    </div>
+
+    {% endfor %}
   </div>
 
   <div>
     <a href="{%url 'create-room' %}">Create Room</a>
     <hr />
+    <h5>{{count}} Rooms Available</h5>
     <br />
     {%for room in rooms %}
     <div>
