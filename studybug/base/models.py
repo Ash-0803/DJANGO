@@ -26,6 +26,12 @@ class Room(models.Model):
         auto_now_add=True
     )  # auto_now_add only alters it the fist time it is updated - that is when it is created
 
+    class Meta:
+        ordering = ["-updated", "-created"]
+
+    def __str__(self):
+        return self.name
+
 
 class Message(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
