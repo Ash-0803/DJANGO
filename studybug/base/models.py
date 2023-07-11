@@ -17,7 +17,7 @@ class Room(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
 
-    # participants =
+    participants = models.ManyToManyField(User, related_name="participants", blank=True)  # since we already connected User to the host previously, we need to let django know, this one is different, hence we use, realted_name = "participants"
 
     updated = models.DateTimeField(
         auto_now=True
@@ -27,6 +27,7 @@ class Room(models.Model):
     )  # auto_now_add only alters it the fist time it is updated - that is when it is created
 
     class Meta:
+        # this will arrange the rooms in descending order.
         ordering = ["-updated", "-created"]
 
     def __str__(self):

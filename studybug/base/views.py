@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from .forms import RoomForm
-from .models import Room, Topic
+from .models import Room, Topic, Message
 
 # Create your views here.
 
@@ -70,8 +70,21 @@ def home(request):
 
 def room(request, pk):
     room = Room.objects.get(id=pk)
+    
+    # Message class is a child of class Room in models, so we can access all the messages, directly by this :
+    room_messages = room.message_set.all().order_by('-created')
+    participants = room.participants.all()
+    
+    if request.method == 'POST':
+        message = Message.objects.create(
+            user = request.user,
+            room = room,
+            body = request.POST.get('body') # it takes the value of "name =body" of the element in the form.
+        )
+        return redirect('room',pk=room.id)  # the page can still reload if we don't use this line, but since we used POST method, to make sure, nothing breaks up, we need to refresh the page.
 
-    context = {"room": room}
+    
+    context = {"room": room, 'room_messages': room_messages, "participants": participants}
     return render(request, "base/room.html", context)
 
 @login_required(login_url="/login")
@@ -87,6 +100,7 @@ def createRoom(request):
     context = {"form": form}
     return render(request, "base/room_form.html", context)
 
+@login_required(login_url="login")
 def updateRoom(request, pk):
     room = Room.objects.get(id=pk)
     form = RoomForm(instance=room)
@@ -101,11 +115,28 @@ def updateRoom(request, pk):
     return render(request, "base/room_form.html", context)
 
 
+@login_required(login_url="login")
 def deleteRoom(request, pk):
     room = Room.objects.get(id=pk)
+    
+    if requset.user != room.host:
+        return HttpResponse("You can't delete anyone else's page. Do mind your own please")
 
     if request.method == "POST":
         room.delete()
         return redirect("home")
 
     return render(request, "base/delete.html", {"obj": room})
+
+@login_required(login_url="login")
+def deleteMessage(request, pk):
+    message = Message.objects.get(id=pk)
+    
+    if request.user != message.user:
+        return HttpResponse("You are not allowed to delete anyone else's message")
+
+    if request.method == "POST":
+        message.delete()
+        return redirect("home")
+
+    return render(request, "base/delete.html", {"obj": message})
