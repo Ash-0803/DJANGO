@@ -1,15 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from .forms import RoomForm
-from .models import Room, Topic, Message
+from .models import Message, Room, Topic
 
 # Create your views here.
 
@@ -63,8 +62,9 @@ def home(request):
     )
     rooms_count = rooms.count()
     topics = Topic.objects.all()
+    room_messages = Message.objects.all()
 
-    context = {"rooms": rooms, "topics": topics, "count":rooms_count}
+    context = {"rooms": rooms, "topics": topics, "count":rooms_count, "room_messages": room_messages}
     return render(request, "base/home.html", context)
 
 
@@ -72,7 +72,7 @@ def room(request, pk):
     room = Room.objects.get(id=pk)
     
     # Message class is a child of class Room in models, so we can access all the messages, directly by this :
-    room_messages = room.message_set.all().order_by('-created')
+    room_messages = room.message_set.all()
     participants = room.participants.all()
     
     if request.method == 'POST':
@@ -81,8 +81,9 @@ def room(request, pk):
             room = room,
             body = request.POST.get('body') # it takes the value of "name =body" of the element in the form.
         )
+        room.participants.add(request.user)
         return redirect('room',pk=room.id)  # the page can still reload if we don't use this line, but since we used POST method, to make sure, nothing breaks up, we need to refresh the page.
-
+    
     
     context = {"room": room, 'room_messages': room_messages, "participants": participants}
     return render(request, "base/room.html", context)
