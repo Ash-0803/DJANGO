@@ -102,31 +102,50 @@ def userProfile(request,pk):
 @login_required(login_url="/login")
 def createRoom(request):
     form = RoomForm()
-
+    topics = Topic.objects.all()
+    
     if request.method == "POST":
-        form = RoomForm(request.POST)
-        if form.is_valid():
-            room = form.save(commit=False) #used to give form "instance" without saving it.
-            room.host = request.user
-            room.save()
+        # form = RoomForm(request.POST)
+        topic_name = request.POST.get('topic')
+        topic,created = Topic.objects.get_or_create(name=topic_name)    #if entered topic exists, it retruns that object, if not, it creates a new object
+        Room.objects.create(
+            host=request.user,
+            topic=topic,
+            name=request.POST.get('name'),
+            description=request.POST.get('description')
+        )
+        
+        # this method can be used when using built-in forms to save. But since we manually created the form, we have to use the method shown above. 
+        # if form.is_valid():
+        #     room = form.save(commit=False) #used to give form "instance" without saving it.
+        #     room.host = request.user
+        #     room.save()
 
-            return redirect("home")
+        return redirect("home")
 
-    context = {"form": form}
+    context = {"form": form, "topics": topics }
     return render(request, "base/room_form.html", context)
 
 @login_required(login_url="login")
 def updateRoom(request, pk):
     room = Room.objects.get(id=pk)
     form = RoomForm(instance=room)
+    topics = Topic.objects.all()
 
     if request.method == "POST":
-        form = RoomForm(request.POST, instance=room)
-        if form.is_valid():
-            form.save()
-            return redirect("home")
+        topic_name=request.POST.get('topic')
+        topic,created = Topic.objects.get_or_create(name=topic_name)
+        room.name = request.POST.get('name')
+        room.topic = topic
+        room.description = request.POST.get('description')
+        room.save()
+        
+        # form = RoomForm(request.POST, instance=room)
+        # if form.is_valid():
+        #     form.save()
+        return redirect("home")
 
-    context = {"form": form}
+    context = {"form": form,"topics":topics, "room": room}
     return render(request, "base/room_form.html", context)
 
 
@@ -155,3 +174,7 @@ def deleteMessage(request, pk):
         return redirect("home")
 
     return render(request, "base/delete.html", {"obj": message})
+
+@login_required(login_url="login")
+def updateUser(request):
+    return render(request, 'base/update-user.html')
