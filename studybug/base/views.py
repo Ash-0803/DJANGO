@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from .forms import RoomForm
+from .forms import RoomForm, UserForm
 from .models import Message, Room, Topic
 
 # Create your views here.
@@ -61,7 +61,7 @@ def home(request):
         Q(description__icontains=q)
     )
     rooms_count = rooms.count()
-    topics = Topic.objects.all()
+    topics = Topic.objects.all()[0:5]
     room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
 
     context = {"rooms": rooms, "topics": topics, "count":rooms_count, "room_messages": room_messages}
@@ -93,7 +93,7 @@ def userProfile(request,pk):
     user = User.objects.get(id=pk)
     rooms = user.room_set.all()
     room_messages = user.message_set.all()
-    topics = Topic.objects.all()
+    topics = Topic.objects.all()[0:5]
 
     context = { 'user':user, 'rooms':rooms, 'room_messages':room_messages, 'topics':topics }
     return render(request,"base/profile.html",context)
@@ -177,4 +177,21 @@ def deleteMessage(request, pk):
 
 @login_required(login_url="login")
 def updateUser(request):
-    return render(request, 'base/update-user.html')
+    form = UserForm(instance = request.user)
+    
+    if request.method == "POST":
+        form = UserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("user-profile",pk=request.user.id)
+    
+    return render(request, 'base/update-user.html', {'form': form})
+
+def topicsPage(request):
+    q = request.GET.get("q") if request.GET.get("q") != None else ""
+    topics = Topic.objects.filter(name__icontains=q)
+    return render(request, 'base/topics.html',{'topics': topics})
+
+def activityPage(request):
+    room_messages = Message.objects.all()
+    return render(request, 'base/activity.html',{'room_messages':room_messages})

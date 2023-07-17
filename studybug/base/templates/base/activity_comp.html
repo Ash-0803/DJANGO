@@ -1,6 +1,6 @@
 <div class="activities">
   <div class="activities__header">
-    <h2>Recent Activities</h2>
+    <h2><a href="{% url 'activity' %}">Recent Activities</a></h2>
   </div>
 
   {% for message in room_messages %}
