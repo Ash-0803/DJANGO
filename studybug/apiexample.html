@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ROOMS</title>
+  </head>
+  <body>
+    <h1>Fascinating ROOMS</h1>
+    <div id="room-contain"></div>
+  </body>
+  <script>
+    let getRooms = async () => {
+      let response = await fetch("http://127.0.0.1:8080/api/rooms/");
+      console.log("response:", response);
+    };
+    getRooms();
+  </script>
+</html>
