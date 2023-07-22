@@ -11,8 +11,11 @@
   </body>
   <script>
     let getRooms = async () => {
-      let response = await fetch("http://127.0.0.1:8080/api/rooms/");
-      console.log("response:", response);
+      let response = await fetch("http://127.0.0.1:8000/api/rooms/");
+      let rooms = await response.json();
+      rooms.forEach((room) => {
+        document.getElementById("room-contain").innerText += room.name;
+      });
     };
     getRooms();
     // if we try to run this code as it is to call the api, it django's in built functions will not allow this page to access our api. Hence we have to work with CORS ahead.
