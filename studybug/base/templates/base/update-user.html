@@ -20,7 +20,8 @@
                 </div>
             </div>
             <div class="layout__body">
-              <form class="form" action="" method="POST">
+              <form class="form" action="" method="POST" enctype="multipart/form-data">
+                <!-- enctype is used to tell that you are submitting files in the data too. IT IS NOT JUST TEXT-->
                 {% csrf_token %}
                 {% for field in form %}
                     <div class="form__group">
