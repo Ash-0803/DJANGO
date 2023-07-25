@@ -61,8 +61,8 @@
     </div>
   </div>
   {% else %}
-  <div class="container">
-    <div class="layout__box">
+  <div class="container" style="justify-content: center">
+    <div class="layout__box" style="position: initial; transform: initial">
       <div class="layout__boxHeader">
         <div class="layout__boxTitle">
           <h3>Register</h3>
@@ -71,7 +71,12 @@
       <div class="layout__body">
         <h2 class="auth__tagline">Find your study partner</h2>
 
-        <form class="form" action="" method="POST">
+        <form
+          class="form"
+          action=""
+          method="POST"
+          enctype="multipart/form-data"
+        >
           {% csrf_token %} {% for field in form %}
           <div class="form__group form__group">
             <label for="room_name">{{field.label}}</label>
