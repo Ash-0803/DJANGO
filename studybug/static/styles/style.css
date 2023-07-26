@@ -213,7 +213,7 @@ a {
   position: absolute;
   top: 5rem;
   right: 0.5rem;
-  background: var(--color-dark-light);
+  background: var(--color-dark-medium);
   border-radius: 5px;
   box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.15);
   overflow: hidden;
@@ -314,9 +314,10 @@ a {
   background: transparent;
   border: none;
   outline: none;
-  color: var(--color-light);
 }
-
+.header__search input::placeholder {
+  color: var(--color-light-gray);
+}
 @media screen and (max-width: 800px) {
   .header__search input {
     width: 20rem;
@@ -737,7 +738,6 @@ a {
 }
 
 .activities__header h2 {
-  background-color: var(--color-dark-light);
   text-transform: uppercase;
   font-weight: 500;
   padding: 1rem 1.5rem;
