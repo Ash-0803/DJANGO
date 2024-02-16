@@ -62,6 +62,9 @@ a {
   text-decoration: none;
 }
 
+.login__error {
+  margin-left: 5px;
+}
 /*========== components ==========*/
 .container {
   max-width: 120rem;

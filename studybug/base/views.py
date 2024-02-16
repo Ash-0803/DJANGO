@@ -72,7 +72,6 @@ def room(request, pk):
     # Message class is a child of class Room in models, so we can access all the messages, directly by this :
     room_messages = room.message_set.all()
     participants = room.participants.all()
-    
     if request.method == 'POST':
         message = Message.objects.create(
             user = request.user,
@@ -151,7 +150,7 @@ def updateRoom(request, pk):
 def deleteRoom(request, pk):
     room = Room.objects.get(id=pk)
     
-    if requset.user != room.host:
+    if request.user != room.host:
         return HttpResponse("You can't delete anyone else's page. Do mind your own please")
 
     if request.method == "POST":
